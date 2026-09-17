@@ -12,7 +12,7 @@
 TimerHandle_t pumpSafetyTimer;
 
 void vPumpSafetyCallback(TimerHandle_t xTimer) {
-    gpio_put(PUMP_RELAY_PIN, 1); // 1 = Spento (assumendo relè logica negata)
+    gpio_put(PUMP_RELAY_PIN, 1); // Spento
     printf("EMERGENZA: Timer pompa scaduto! Spegnimento forzato.\n");
 }
 
@@ -21,11 +21,11 @@ void actuatorTask(void *pvParameters) {
 
     gpio_init(PUMP_RELAY_PIN);
     gpio_set_dir(PUMP_RELAY_PIN, GPIO_OUT);
-    gpio_put(PUMP_RELAY_PIN, 1); // Spento di default
+    gpio_put(PUMP_RELAY_PIN, 1); // Spento
 
     gpio_init(FAN_PIN);
     gpio_set_dir(FAN_PIN, GPIO_OUT);
-    gpio_put(FAN_PIN, 0); // Spento di default (logica normale)
+    gpio_put(FAN_PIN, 0); // Spento
 
     pumpSafetyTimer = xTimerCreate("PumpTimer", pdMS_TO_TICKS(10000), pdFALSE, (void *)0, vPumpSafetyCallback);
 

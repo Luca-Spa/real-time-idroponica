@@ -23,7 +23,7 @@ int main()
     xTaskCreate(actuatorTask, "ActuatorTask", 256, NULL, 3, &actuatorHandle);
     xTaskCreate(communicationTask, "CommTask", 4096, NULL, 2, &commHandle);
 
-    // micro-ROS sul core 0, sensori/attuatori sul core 1
+    // micro-ROS sul core 0, sensori e attuatori sul core 1
     vTaskCoreAffinitySet(sensorHandle, (1 << 1));
     vTaskCoreAffinitySet(actuatorHandle, (1 << 1));
     vTaskCoreAffinitySet(commHandle, (1 << 0));
