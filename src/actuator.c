@@ -6,7 +6,7 @@
 #include "hardware/gpio.h"
 #include <stdio.h>
 
-#define PUMP_RELAY_PIN 14
+#define PUMP_RELAY_PIN 25
 #define FAN_PIN 15
 
 TimerHandle_t pumpSafetyTimer;
