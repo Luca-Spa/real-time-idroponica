@@ -23,6 +23,7 @@ target_link_libraries(idroponica
     hardware_gpio
     hardware_pio
     hardware_dma
+    pico_cyw43_arch_none
     FreeRTOS-Kernel FreeRTOS-Kernel-Heap4
     microros
 )
