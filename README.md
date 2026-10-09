@@ -11,7 +11,7 @@ Per eseguire il progetto, è necessario avviare i processi in questo ordine:
 ```bash
 ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
 ```
-(Nota: la porta `/dev/ttyACM0` potrebbe variare a seconda del sistema operativo).
+* (Nota: la porta `/dev/ttyACM0` potrebbe variare a seconda del sistema operativo).
 3. Avvio del Controller Host
 * Eseguire il source del workspace ROS2 e avviare il nodo C++:
 ```bash
