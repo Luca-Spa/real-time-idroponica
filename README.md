@@ -15,5 +15,5 @@ ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
 3. Avvio del Controller Host
 * Eseguire il source del workspace ROS2 e avviare il nodo C++:
 ```bash
-ros2 run <nome_del_tuo_pacchetto> pico_controller_node
+ros2 run <nome_del_pacchetto> pico_controller_node
 ```
