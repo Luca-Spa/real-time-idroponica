@@ -1,4 +1,7 @@
-Come eseguire il progetto \n
+# Progetto idroponica
+Questo progetto implementa un sistema di controllo distribuito per l'automazione di una coltivazione idroponica o serra.
+Il sistema include un nodo edge da eseguire sulla scheda Raspberry Pi Pico e un nodo host. La comunicazione avviene tramite microros.
+## Come eseguire il progetto
 Per eseguire il progetto, è necessario avviare i processi in questo ordine:
 1. Preparazione dell'Hardware (Pico)
 Compila il firmware per Raspberry Pi Pico utilizzando CMake.
