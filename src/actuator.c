@@ -6,22 +6,22 @@
 #include "hardware/gpio.h"
 #include <stdio.h>
 
-#define PUMP_RELAY_PIN 25
+#define PUMP_PIN 25
 #define FAN_PIN 15
 
 TimerHandle_t pumpSafetyTimer;
 
 void vPumpSafetyCallback(TimerHandle_t xTimer) {
-    gpio_put(PUMP_RELAY_PIN, 1); // Spento
+    gpio_put(PUMP_PIN, 1); // Spento
     printf("EMERGENZA: Timer pompa scaduto! Spegnimento forzato.\n");
 }
 
 void actuatorTask(void *pvParameters) {
     ActuatorCmd_t cmd;
 
-    gpio_init(PUMP_RELAY_PIN);
-    gpio_set_dir(PUMP_RELAY_PIN, GPIO_OUT);
-    gpio_put(PUMP_RELAY_PIN, 1); // Spento
+    gpio_init(PUMP_PIN);
+    gpio_set_dir(PUMP_PIN, GPIO_OUT);
+    gpio_put(PUMP_PIN, 1); // Spento
 
     gpio_init(FAN_PIN);
     gpio_set_dir(FAN_PIN, GPIO_OUT);
@@ -33,7 +33,7 @@ void actuatorTask(void *pvParameters) {
         if (xQueueReceive(actuatorQueue, &cmd, portMAX_DELAY) == pdPASS) {
             if (cmd.device == ACT_PUMP) {
                 // Logica negata: se state è true, metto il pin a 0
-                gpio_put(PUMP_RELAY_PIN, !cmd.state);
+                gpio_put(PUMP_PIN, !cmd.state);
                 
                 if (cmd.state == true) {
                     xTimerStart(pumpSafetyTimer, 0);
