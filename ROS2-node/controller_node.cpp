@@ -10,19 +10,19 @@ public:
     PicoControllerNode() : Node("pico_controller_node")
     {
         // Publisher usando il tipo standard Bool
-        pump_pub_ = this->create_publisher<std_msgs::msg::Bool>("/hydro/actuators/pump", 10);
-        fan_pub_ = this->create_publisher<std_msgs::msg::Bool>("/hydro/actuators/fan", 10);
+        pump_pub_ = this->create_publisher<std_msgs::msg::Bool>("/hydro/control/pump", 10);
+        fan_pub_ = this->create_publisher<std_msgs::msg::Bool>("/hydro/control/fan", 10);
 
         // Subscriber per i sensori
         humidity_sub_ = this->create_subscription<std_msgs::msg::Float32>(
-            "/sensors/humidity", 10,
+            "/hydro/sensors/humidity", 10,
             std::bind(&PicoControllerNode::humidity_callback, this, std::placeholders::_1));
 
         temperature_sub_ = this->create_subscription<std_msgs::msg::Float32>(
-            "/sensors/temperature", 10,
+            "/hydro/sensors/temperature", 10,
             std::bind(&PicoControllerNode::temperature_callback, this, std::placeholders::_1));
 
-        RCLCPP_INFO(this->get_logger(), "Pico Controller avviato. In attesa di dati...");
+        RCLCPP_INFO(this->get_logger(), "Attesa dati...");
     }
 
 private:
@@ -40,7 +40,7 @@ private:
             
             pump_active_ = desired_state; // Aggiorna lo stato interno
             
-            RCLCPP_INFO(this->get_logger(), "Umidità %.1f%% - POMPA impostata su: %s", 
+            RCLCPP_INFO(this->get_logger(), "Umidità %.1f%% - pompa impostata su: %s", 
                         msg->data, desired_state ? "ON" : "OFF");
         }
     }
@@ -55,7 +55,7 @@ private:
             
             fan_active_ = desired_state; 
             
-            RCLCPP_INFO(this->get_logger(), "Temperatura %.1f°C - VENTOLA impostata su: %s", 
+            RCLCPP_INFO(this->get_logger(), "Temperatura %.1f°C - ventola impostata su: %s", 
                         msg->data, desired_state ? "ON" : "OFF");
         }
     }
