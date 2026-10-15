@@ -11,9 +11,7 @@ bool fan_active = false;
 rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr pump_pub;
 rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr fan_pub;
 
-void humidity_callback(
-    const std_msgs::msg::Float32::SharedPtr msg)
-{
+void humidity_callback(const std_msgs::msg::Float32::SharedPtr msg){
     bool desired_state = (msg->data < 30.0f);
 
     if (desired_state != pump_active) {
@@ -37,9 +35,7 @@ void humidity_callback(
     }
 }
 
-void temperature_callback(
-    const std_msgs::msg::Float32::SharedPtr msg)
-{
+void temperature_callback(const std_msgs::msg::Float32::SharedPtr msg){
     bool desired_state = (msg->data > 25.0f);
 
     if (desired_state != fan_active) {
@@ -63,8 +59,7 @@ void temperature_callback(
     }
 }
 
-int main(int argc, char * argv[])
-{
+int main(int argc, char * argv[]){
     rclcpp::init(argc, argv);
 
     auto node = std::make_shared<rclcpp::Node>(
