@@ -35,13 +35,20 @@ private:
         // Pubblica il comando solo se lo stato desiderato è diverso da quello attuale
         if (desired_state != pump_active_) {
             std_msgs::msg::Bool cmd;
+            const char* state;
             cmd.data = desired_state;
             pump_pub_->publish(cmd);
             
             pump_active_ = desired_state; // Aggiorna lo stato interno
-            
-            RCLCPP_INFO(this->get_logger(), "Umidità %.1f%% - pompa impostata su: %s", 
-                        msg->data, desired_state ? "ON" : "OFF");
+
+            if (desired_state) {
+                state = "ON";
+            } else {
+                state = "OFF";
+            }
+
+            RCLCPP_INFO(this->get_logger(), "Umidità %.1f%% - pompa impostata su: %s",
+                        msg->data, state);
         }
     }
 
@@ -50,13 +57,20 @@ private:
 
         if (desired_state != fan_active_) {
             std_msgs::msg::Bool cmd;
+            const char* state;
             cmd.data = desired_state;
             fan_pub_->publish(cmd);
             
             fan_active_ = desired_state; 
-            
-            RCLCPP_INFO(this->get_logger(), "Temperatura %.1f°C - ventola impostata su: %s", 
-                        msg->data, desired_state ? "ON" : "OFF");
+
+            if (desired_state) {
+                state = "ON";
+            } else {
+                state = "OFF";
+            }
+
+            RCLCPP_INFO(this->get_logger(), "Umidità %.1f%% - pompa impostata su: %s",
+                        msg->data, state);
         }
     }
 
