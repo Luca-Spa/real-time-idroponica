@@ -1,94 +1,89 @@
 #include <memory>
-#include <functional>
-
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/float32.hpp"
 #include "std_msgs/msg/bool.hpp"
 
-bool pump_active = false;
-bool fan_active = false;
 
-rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr pump_pub;
-rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr fan_pub;
+class PicoControllerNode : public rclcpp::Node
+{
+public:
+    PicoControllerNode() : Node("pico_controller_node")
+    {
+        // Publisher usando il tipo standard Bool
+        pump_pub_ = this->create_publisher<std_msgs::msg::Bool>("/hydro/control/pump", 10);
+        fan_pub_ = this->create_publisher<std_msgs::msg::Bool>("/hydro/control/fan", 10);
 
-void humidity_callback(const std_msgs::msg::Float32::SharedPtr msg){
-    bool desired_state = (msg->data < 30.0f);
-
-    if (desired_state != pump_active) {
-        std_msgs::msg::Bool cmd;
-        cmd.data = desired_state;
-
-        pump_pub->publish(cmd);
-        pump_active = desired_state;
-
-        const char* stato;
-        if (desired_state) {
-            stato = "ON";
-        } else {
-            stato = "OFF";
-        }
-
-        RCLCPP_INFO(
-            rclcpp::get_logger("pico_controller_node"),
-            "Umidità %.1f%% - pompa impostata su: %s",
-            msg->data, stato);
-    }
-}
-
-void temperature_callback(const std_msgs::msg::Float32::SharedPtr msg){
-    bool desired_state = (msg->data > 25.0f);
-
-    if (desired_state != fan_active) {
-        std_msgs::msg::Bool cmd;
-        cmd.data = desired_state;
-
-        fan_pub->publish(cmd);
-        fan_active = desired_state;
-
-        const char* stato;
-        if (desired_state) {
-            stato = "ON";
-        } else {
-            stato = "OFF";
-        }
-
-        RCLCPP_INFO(
-            rclcpp::get_logger("pico_controller_node"),
-            "Temperatura %.1f°C - ventola impostata su: %s",
-            msg->data, stato);
-    }
-}
-
-int main(int argc, char * argv[]){
-    rclcpp::init(argc, argv);
-
-    auto node = std::make_shared<rclcpp::Node>(
-        "pico_controller_node");
-
-    pump_pub =
-        node->create_publisher<std_msgs::msg::Bool>(
-            "/hydro/control/pump", 10);
-
-    fan_pub =
-        node->create_publisher<std_msgs::msg::Bool>(
-            "/hydro/control/fan", 10);
-
-    auto humidity_sub =
-        node->create_subscription<std_msgs::msg::Float32>(
+        // Subscriber per i sensori
+        humidity_sub_ = this->create_subscription<std_msgs::msg::Float32>(
             "/hydro/sensors/humidity", 10,
-            humidity_callback);
+            std::bind(&PicoControllerNode::humidity_callback, this, std::placeholders::_1));
 
-    auto temperature_sub =
-        node->create_subscription<std_msgs::msg::Float32>(
+        temperature_sub_ = this->create_subscription<std_msgs::msg::Float32>(
             "/hydro/sensors/temperature", 10,
-            temperature_callback);
+            std::bind(&PicoControllerNode::temperature_callback, this, std::placeholders::_1));
 
-    RCLCPP_INFO(
-        node->get_logger(),
-        "Attesa dati...");
+        RCLCPP_INFO(this->get_logger(), "Attesa dati...");
+    }
 
-    rclcpp::spin(node);
+private:
+    bool pump_active_;
+    bool fan_active_;
 
+    void humidity_callback(const std_msgs::msg::Float32::SharedPtr msg) {
+        bool desired_state = (msg->data < 30.0f);
+
+        // Pubblica il comando solo se lo stato desiderato è diverso da quello attuale
+        if (desired_state != pump_active_) {
+            std_msgs::msg::Bool cmd;
+            const char* state;
+            cmd.data = desired_state;
+            pump_pub_->publish(cmd);
+            
+            pump_active_ = desired_state; // Aggiorna lo stato interno
+
+            if (desired_state) {
+                state = "ON";
+            } else {
+                state = "OFF";
+            }
+
+            RCLCPP_INFO(this->get_logger(), "Umidità %.1f%% - pompa impostata su: %s",
+                        msg->data, state);
+        }
+    }
+
+    void temperature_callback(const std_msgs::msg::Float32::SharedPtr msg) {
+        bool desired_state = (msg->data > 25.0f); 
+
+        if (desired_state != fan_active_) {
+            std_msgs::msg::Bool cmd;
+            const char* state;
+            cmd.data = desired_state;
+            fan_pub_->publish(cmd);
+            
+            fan_active_ = desired_state; 
+
+            if (desired_state) {
+                state = "ON";
+            } else {
+                state = "OFF";
+            }
+
+            RCLCPP_INFO(this->get_logger(), "Umidità %.1f%% - pompa impostata su: %s",
+                        msg->data, state);
+        }
+    }
+
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr pump_pub_;
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr fan_pub_;
+    rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr humidity_sub_;
+    rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr temperature_sub_;
+};
+
+int main(int argc, char * argv[])
+{
+    rclcpp::init(argc, argv);
+    rclcpp::spin(std::make_shared<PicoControllerNode>());
     rclcpp::shutdown();
     return 0;
 }
